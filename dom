@@ -91,7 +91,8 @@ echo TXT:$(nslookup -q=txt $dominio | grep text | awk -F'"' '{print $2}')
 echo "================================================="
 echo "|PING|"
 echo "-------------------------------------------------"
-ping -c4 $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
+#ping -c4 $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
+ping $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
 echo "-------------------------------------------------"
 }
 if [ $x -eq 1 ]
