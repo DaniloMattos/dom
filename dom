@@ -1,0 +1,111 @@
+#!/bin/bash
+
+#
+#Dom - Informações do dominio
+#Danilo Mattos
+#04/04/2019
+clear
+var=$(echo $1 | grep ".br$")
+dominio=$1
+if [ -z $var ]
+then
+#       echo "dominio internacional"
+        x=1
+else
+#       echo "dominio nacional"
+        x=2
+fi
+
+#DNS(){
+#       nslookup -q=ns $dominio | grep "nameserver" | awk '{print $4}'
+#}
+
+PATHWHOIS="./tmp/dom.tmp"
+
+CABECALHO(){
+
+        echo "================================================="
+        echo "        DOM - Informações-do-dominio"
+        echo "================================================="
+}
+ALTERACOES(){
+        if [ -d ./tmp ]
+        then
+        echo "# by Danilo Mattos v.3"
+        echo "================================================="
+        else
+        mkdir ./tmp
+        fi
+
+        whois $dominio > $PATHWHOIS
+        #Data de alteração da dns
+        if [ $x -eq 1 ]
+        then
+        sed 's/Domain Name/Dominio/g' $PATHWHOIS | grep --color "Dominio:"
+        echo "================================================="
+        sed 's/Domain Status/Status/g'  $PATHWHOIS  | grep  "Status:" | awk '{print $1,$2}'
+        echo "================================================="
+        sed 's/Name Server/DNS/g' $PATHWHOIS | egrep --color "DNS:"
+        echo "================================================="
+        sed 's/Updated Date/Alteração/g' $PATHWHOIS | grep  "Alteração:" | cut -d'T' -f1
+        echo '-------------------------------------------------'
+        sed 's/Creation Date/Criação/g' $PATHWHOIS | grep  "Criação:" | cut -d'T' -f1
+        echo '-------------------------------------------------'
+                sed 's/Registry Expiry Date/Expiração/g' $PATHWHOIS | grep  "Expiração:" | cut -d'T' -f1
+        echo '-------------------------------------------------'
+        elif [ $x -eq 2 ]
+        then
+        sed 's/domain/Dominio/' $PATHWHOIS | grep --color "Dominio:"
+        echo "================================================="
+        sed 's/status/Status/ ; s/published/Ativo/ ; s/on-hold/Congelado/; s/dsStatus/null/' $PATHWHOIS | grep "Status:"
+        echo "================================================="
+        sed 's/nserver/DNS/g' $PATHWHOIS | grep --color "DNS"
+        echo "================================================="
+        echo -n "$( sed 's/changed/Alteração/' $PATHWHOIS | grep -m1 'Alteração:' | awk '{print $1}' ) "
+               sed 's/changed/Alteração/' $PATHWHOIS | grep -m1 "Alteração:" | awk '{print $2}' | sed -e 's/\(....\)\(..\)\(..\)/\1-\2-\3/'
+        echo '-------------------------------------------------'
+        echo -n "$( sed 's/created:/Criação:/' $PATHWHOIS | grep -m1 'Criação:' | awk '{print $1}' ) "
+               sed 's/created:/Criação:/' $PATHWHOIS | grep -m1 "Criação:" | awk '{print $2}' | sed -e 's/\(....\)\(..\)\(..\)/\1-\2-\3/'
+        echo '-------------------------------------------------'
+        echo -n "$( sed 's/expires/Expiração/' $PATHWHOIS | grep -m1 'Expiração:' | awk '{print $1}' ) "
+        sed 's/expires/Expiração/' $PATHWHOIS | grep -m1 "Expiração:" | awk '{print $2}' | sed -e 's/\(....\)\(..\)\(..\)/\1-\2-\3/'
+        echo '-------------------------------------------------'
+        fi
+}
+MX(){
+        echo -n "   IP  :  "
+nslookup -q=a $dominio |grep "Address" | grep -v "127.0" | grep -n ^ | grep ^1 | awk '{print $2}'
+echo -n "   IP2 :  "
+nslookup -q=a $dominio | grep "Address" | grep -v "127.0" | grep -n ^ | grep ^2 | awk '{print $2}'
+echo ' '
+echo "================================================="
+echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^1 | awk '{print $NF}')
+echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^2 | awk '{print $NF}')
+echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^3 | awk '{print $NF}')
+echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^4 | awk '{print $NF}')
+echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^5 | awk '{print $NF}')
+echo "================================================="
+echo Servidor:$(nslookup -q=cname $dominio | grep origin | awk '{print $NF}')
+echo "================================================="
+echo TXT:$(nslookup -q=txt $dominio | grep text | awk -F'"' '{print $2}')
+echo "================================================="
+echo "|PING|"
+echo "-------------------------------------------------"
+ping -c4 $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
+echo "-------------------------------------------------"
+}
+if [ $x -eq 1 ]
+then
+#       DNS
+        CABECALHO
+        ALTERACOES
+        MX
+fi
+
+if [ $x -eq 2 ]
+then
+#       DNS
+        CABECALHO
+        ALTERACOES
+        MX
+fi
