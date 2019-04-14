@@ -4,6 +4,8 @@
 #Dom - Informações do dominio
 #Danilo Mattos
 #04/04/2019
+#Sintaxe: dom [dominio]
+#Não utilizar 'http://'; 'https://'; '/path'
 clear
 var=$(echo $1 | grep ".br$")
 dominio=$1
