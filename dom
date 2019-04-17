@@ -81,11 +81,10 @@ echo -n "   IP2 :  "
 nslookup -q=a $dominio | grep "Address" | grep -v "127.0" | grep -n ^ | grep ^2 | awk '{print $2}'
 echo ' '
 echo "================================================="
-echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^1 | awk '{print $NF}')
-echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^2 | awk '{print $NF}')
-echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^3 | awk '{print $NF}')
-echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^4 | awk '{print $NF}')
-echo MX:$(nslookup -q=mx $dominio | grep mail | grep -n ^ | grep ^5 | awk '{print $NF}')
+for mx in $(dig mx $dominio +short | awk '{print $2}')
+do 
+echo "MX: $mx"
+done
 echo "================================================="
 echo Servidor:$(nslookup -q=cname $dominio | grep origin | awk '{print $NF}')
 echo "================================================="
@@ -93,7 +92,8 @@ echo TXT:$(nslookup -q=txt $dominio | grep text | awk -F'"' '{print $2}')
 echo "================================================="
 echo "|PING|"
 echo "-------------------------------------------------"
-ping -c4 $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
+ping -c4 $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g  s/
+//g' | grep "Perdidos"
 #ping $dominio | sed -e 's/packets\?//g ; s/received/.Recebidos/g ; s/transmitted/.Transmitidos/g ;  s/loss/.Perdidos/g ; s/time/Tempo./g' | grep "Perdidos"
 echo "-------------------------------------------------"
 }
