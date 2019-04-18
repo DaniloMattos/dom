@@ -69,6 +69,8 @@ ALTERACOES(){
         echo -n "$( sed 's/created:/Criação:/' $PATHWHOIS | grep -m1 'Criação:' | awk '{print $1}' ) "
                sed 's/created:/Criação:/' $PATHWHOIS | grep -m1 "Criação:" | awk '{print $2}' | sed -e 's/\(....\)\(..\)\(..\)/\1-\2-\3/'
         echo '-------------------------------------------------'
+        echo  "$(sed 's/provider/Provedor/g' /tmp/dom.tmp | grep  "Provedor:" | cut -d'T' -f1 | uniq)"
+        echo '-------------------------------------------------'
         echo -n "$( sed 's/expires/Expiração/' $PATHWHOIS | grep -m1 'Expiração:' | awk '{print $1}' ) "
         sed 's/expires/Expiração/' $PATHWHOIS | grep -m1 "Expiração:" | awk '{print $2}' | sed -e 's/\(....\)\(..\)\(..\)/\1-\2-\3/'
         echo '-------------------------------------------------'
